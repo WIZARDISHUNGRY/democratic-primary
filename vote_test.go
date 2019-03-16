@@ -50,7 +50,7 @@ func weighted(weights map[string]int) []*string {
 		result = append(result, &n)
 		i++
 		v--
-		if v > 0 {
+		if v >= 0 {
 			goto REDO
 		}
 	}
