@@ -69,19 +69,19 @@ func randomBallot(random *rand.Rand, choices []*string, min, max int) []string {
 	}
 
 	count := rand.Intn(max-min) + min
-	votes := make(map[*string]bool, count)
+	votes := make(map[string]bool, count)
 	output := make([]string, count, count)
 	for ; count > 0; count-- {
 	RETRY: // suboptimal but better than building a giant decision tree in memory since we don't expect more than a handful of votes per
 		index := random.Intn(len(choices))
-		vote := choices[index]
+		vote := *choices[index]
 		if exists := votes[vote]; exists {
 			// fmt.Printf("exists %d %s\n", index, *vote)
 			goto RETRY
 		}
 		// fmt.Printf("ranked %d %s\n", index, *vote)
 		votes[vote] = true
-		output[count-1] = *vote
+		output[count-1] = vote
 	}
 	return output
 }
@@ -108,8 +108,8 @@ func TestVeryMany(t *testing.T) {
 	// poll.AddBallot([]string{"Kang"})
 	// poll.AddBallot([]string{"Kodos"})
 
-	c := make(chan []string)
 	length := runtime.GOMAXPROCS(0)
+	c := make(chan []string, length)
 	quitters := make([]chan bool, length)
 	for i := 0; i < length; i++ {
 		quitters[i] = make(chan bool)
@@ -127,9 +127,9 @@ func TestVeryMany(t *testing.T) {
 		}(quitters[i])
 	}
 
-	for i := 0; i < population; i++ {
+	for i := 0; i < population/100; i++ {
 		ballot := <-c
-		if i%100000 == 0 {
+		if i%1000000 == 0 {
 			fmt.Println(i, ballot)
 		}
 		poll.AddBallot(ballot)
