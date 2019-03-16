@@ -68,20 +68,20 @@ func randomBallot(random *rand.Rand, choices []*string, min, max int) []string {
 		panic("max > len(choices)")
 	}
 
-	count := rand.Intn(max-min) + min
+	count := random.Intn(max-min+1) + min
 	votes := make(map[string]bool, count)
 	output := make([]string, count, count)
-	for ; count > 0; count-- {
+	for i := 0; i < count; i++ {
 	RETRY: // suboptimal but better than building a giant decision tree in memory since we don't expect more than a handful of votes per
 		index := random.Intn(len(choices))
 		vote := *choices[index]
 		if exists := votes[vote]; exists {
-			// fmt.Printf("exists %d %s\n", index, *vote)
+			//fmt.Printf("exists %d %s\n", index, vote)
 			goto RETRY
 		}
-		// fmt.Printf("ranked %d %s\n", index, *vote)
+		//fmt.Printf("ranked %d %s\n", index, vote)
 		votes[vote] = true
-		output[count-1] = vote
+		output[i] = vote
 	}
 	return output
 }
@@ -102,7 +102,6 @@ func TestVeryMany(t *testing.T) {
 	dems := democrats()
 	candidates := candidateList(dems)
 	deck := weighted(dems)
-	fmt.Println(candidates)
 	poll, _ := govote.Schulze.New(candidates)
 	// poll.AddBallot([]string{"Kang"})
 	// poll.AddBallot([]string{"Kang"})
