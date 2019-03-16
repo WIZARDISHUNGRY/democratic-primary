@@ -126,7 +126,7 @@ func TestVeryMany(t *testing.T) {
 		}(quitters[i])
 	}
 
-	for i := 0; i < population/100; i++ {
+	for i := 0; i < population/10; i++ {
 		ballot := <-c
 		if i%1000000 == 0 {
 			fmt.Println(i, ballot)
